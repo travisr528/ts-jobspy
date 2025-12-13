@@ -1,0 +1,5 @@
+# Job Scraper for Render
+python-jobspy
+pandas
+flask
+gunicorn
