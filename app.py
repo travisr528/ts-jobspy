@@ -31,7 +31,7 @@ def run_job_search():
         print('='*60)
         
         # Import and run the search
-        from run_search_render import main
+        from run_search import main
         job_count = main()
         
         last_search_time = datetime.now()
