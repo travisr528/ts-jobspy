@@ -66,7 +66,8 @@ def scrape_jobs_for_term(search_term):
             location="United States",
             is_remote=True,
             results_wanted=50,
-            hours_old=168  # Last 7 days
+            hours_old=168,  # Last 7 days
+            full_description=True  # ADDED: Fetch full job descriptions
         )
         if len(remote_jobs) > 0:
             jobs_list.append(remote_jobs)
@@ -81,7 +82,8 @@ def scrape_jobs_for_term(search_term):
             search_term=search_term,
             location="Austin, Texas",
             results_wanted=50,
-            hours_old=168
+            hours_old=168,
+            full_description=True  # ADDED: Fetch full job descriptions
         )
         if len(austin_jobs) > 0:
             jobs_list.append(austin_jobs)
@@ -119,6 +121,11 @@ def main():
     all_jobs = pd.concat(all_jobs_list, ignore_index=True)
     print(f"  Total jobs before processing: {len(all_jobs)}")
     
+    # Check if descriptions were fetched
+    if 'description' in all_jobs.columns:
+        desc_count = all_jobs['description'].notna().sum()
+        print(f"  Jobs with descriptions: {desc_count}/{len(all_jobs)}")
+    
     # Deduplicate by URL
     all_jobs = all_jobs.drop_duplicates(subset=['job_url'], keep='first')
     print(f"  After URL deduplication: {len(all_jobs)}")
@@ -154,6 +161,12 @@ def main():
     # Only include columns that exist
     available_columns = [col for col in output_columns if col in filtered_jobs.columns]
     output_df = filtered_jobs[available_columns]
+    
+    # Truncate descriptions to avoid CSV issues (keep first 2000 chars)
+    if 'description' in output_df.columns:
+        output_df['description'] = output_df['description'].apply(
+            lambda x: str(x)[:2000] if pd.notna(x) else ''
+        )
     
     # Save to CSV
     output_df.to_csv('job_results.csv', index=False)
