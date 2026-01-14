@@ -81,7 +81,7 @@ def scrape_jobs_for_term(search_term):
             site_name=["linkedin"],
             search_term=search_term,
             location="Austin, Texas",
-            results_wanted=50,
+            results_wanted=25,
             hours_old=168,
             full_description=True  # ADDED: Fetch full job descriptions
         )
